@@ -1,0 +1,238 @@
+---
+title: "Lab4"
+authors: "Soma Parvathini (svp98), Josh Mondragon, Nathan Mukkidipalli"
+date: "2025-03-28"
+output: html_document
+---
+
+```{r}
+
+
+
+library(dplyr)   
+library(countrycode)
+library(readr)
+library(ggplot2)
+
+
+```
+
+```{r}
+
+boxoffice <- read_csv("movie_boxoffice-1.csv")
+
+
+```
+
+### **Problem 0: How many duplicated records were removed from boxoffice data? What is your random seed number?**
+
+```{r}
+
+set.seed(12345)
+
+nBefore <- nrow(boxoffice)
+
+boxoffice <- distinct(boxoffice)
+
+nAfter <- nrow(boxoffice)
+
+dupRemoved <- nBefore - nAfter
+
+cat("Number of duplicate records removed:", dupRemoved, "\n")
+cat("Random seed number used: 12345 \n")
+
+
+```
+
+# **Part I: Sampling**
+
+### **Problem 1: Treat the box office data as your population. Have a histogram of the global box office earning. Describe the shape of the distribution**
+
+
+
+```{r}
+
+
+ggplot(boxoffice, aes(x = Worldwide_Gross)) +
+  geom_histogram(binwidth = 25, color = "black") +
+  labs(title = "Histogram of Global Box Office Earnings",
+       x = "Global Box Office Earnings (Millions)",
+       y = "Frequency")
+
+
+```
+
+The shape of the distribution seems to be right skewed (positively skewed). There is a high frequency of movies that make relatively low box office earnings. This is why there is a huge peak on the left side. Finally, the spread is super large, stretching from near 0 to over 2,000 million.
+
+
+### **Problem 2: In the population, what is the average global box office earning? What is the standard deviation? What is the proportion of movies whose global box office earning exceeds budget?**
+
+```{r}
+
+
+
+avgGlobal <- mean(boxoffice$Worldwide_Gross)
+sdGlobal <- sd(boxoffice$Worldwide_Gross)
+propExceed <- mean(boxoffice$Worldwide_Gross > boxoffice$Budget)
+
+cat("Average Global Box Office Earning (Millions):", avgGlobal, "\n")
+cat("Standard Deviation of Global Box Office Earning (Millions):", sdGlobal, "\n")
+cat("Proportion of Movies Whose Global Box Office Earning Exceeds Budget:", propExceed, "\n")
+
+
+```
+
+
+### **Problem 3: Take a random sample of 200 movies from the population, get the histogram of global box office earning, and describe the shape of the distribution. You are going to use this sample in part II and future homework.**
+
+```{r}
+
+
+sample200 <- sample_n(boxoffice, 200)
+
+
+ggplot(sample200, aes(x = Worldwide_Gross)) +
+  geom_histogram(binwidth = 25, color = "black") +
+  labs(title = "Histogram of Global Box Office Earnings with a Sample of 200 Movies",
+       x = "Global Box Office Earnings (Millions)",
+       y = "Frequency")
+
+
+```
+Once again, we can see that the histogram is right skewed (positively skewed). Similar to the previously histogram, there is still a peak toward the lower end of the histogram, indicating that most movies tend have relatively low global box office earnings.
+
+
+```{r}
+
+
+
+avgSample200 <- mean(sample200$Worldwide_Gross)
+sdSample200 <- sd(sample200$Worldwide_Gross)
+propExceedSample200 <- mean(sample200$Worldwide_Gross > sample200$Budget)
+
+cat("Average Global Box Office Earning in Millions of $ with sample of 200:", avgSample200, "\n")
+cat("Standard Deviation of Global Box Office Earning in Millions of $ with sample of 200:", sdSample200, "\n")
+cat("Proportion of Movies Whose Global Box Office Earning Exceeds Budget with sample of 200:", propExceedSample200, "\n")
+
+
+
+```
+When we look at the statistics for both the sample of 200 and the population we can see that the average, standard deviation, and proportion is very close to each other. 
+
+
+### **Problem 4: In your sample, what is the average global box office earning? What is the standard deviation? What is the proportion of movies whose global box office earning exceeds budget? Are these summary statistics from the sample close to those population parameters?**
+
+
+```{r}
+
+# Make sure to transpose if you want to preview the simulation results for every replication
+
+
+# n = 20
+sim_n20 <- replicate(500, {
+  samp <- sample_n(boxoffice, 20)
+  c(avg = mean(samp$Worldwide_Gross, na.rm = TRUE),
+    prop = mean(samp$Worldwide_Gross > samp$Budget, na.rm = TRUE))
+})
+
+
+# n = 50
+sim_n50 <- replicate(500, {
+  samp <- sample_n(boxoffice, 50)
+  c(avg = mean(samp$Worldwide_Gross, na.rm = TRUE),
+    prop = mean(samp$Worldwide_Gross > samp$Budget, na.rm = TRUE))
+})
+
+
+#n = 100
+sim_n100 <- replicate(500, {
+  samp <- sample_n(boxoffice, 100)
+  c(avg = mean(samp$Worldwide_Gross, na.rm = TRUE),
+    prop = mean(samp$Worldwide_Gross > samp$Budget, na.rm = TRUE))
+})
+
+
+# n = 200
+sim_n200 <- replicate(500, {
+  samp <- sample_n(boxoffice, 200)
+  c(avg = mean(samp$Worldwide_Gross, na.rm = TRUE),
+    prop = mean(samp$Worldwide_Gross > samp$Budget, na.rm = TRUE))
+})
+
+
+
+```
+
+
+### **Problem 6: For each n=20, 50, 100 and 200, get the histogram of the average global box office earning. Have histograms using facet_wrap() so the four histograms are in the same picture for easy comparison. Also get the mean and standard error of the average global box office earning.**
+
+```{r}
+
+sim_avg20  <- data.frame(avg = as.numeric(sim_n20[1, ]), sampleSize = "n=20")
+sim_avg50  <- data.frame(avg = as.numeric(sim_n50[1, ]), sampleSize = "n=50")
+sim_avg100 <- data.frame(avg = as.numeric(sim_n100[1, ]), sampleSize = "n=100")
+sim_avg200 <- data.frame(avg = as.numeric(sim_n200[1, ]), sampleSize = "n=200")
+
+combinedSim <- rbind(sim_avg20, sim_avg50, sim_avg100, sim_avg200)
+
+ggplot(combinedSim, aes(x = avg)) +
+  geom_histogram(binwidth = 25, color = "black") +
+  facet_wrap(~ sampleSize) +
+  labs(title = "Histograms of Average Global Box Office Earnings by Sample Size",
+       x = "Average Global Box Office Earnings (Millions)",
+       y = "Frequency") +
+  theme_minimal()
+
+avg_n20 <- mean(as.numeric(sim_n20[1, ]))
+se_n20  <- sd(as.numeric(sim_n20[1, ]))
+cat("For sample size n = 20:\n")
+cat("Average Global Box Office Earning (Millions):", avg_n20, "\n")
+cat("Standard Error:", se_n20, "\n")
+
+avg_n50 <- mean(as.numeric(sim_n50[1, ]))
+se_n50  <- sd(as.numeric(sim_n50[1, ]))
+cat("For sample size n = 50:\n")
+cat("Average Global Box Office Earning in Millions:", avg_n50, "\n")
+cat("Standard Error:", se_n50, "\n")
+
+avg_n100 <- mean(as.numeric(sim_n100[1, ]))
+se_n100  <- sd(as.numeric(sim_n100[1, ]))
+cat("For sample size n = 100:\n")
+cat("Average Global Box Office Earning in Millions:", avg_n100, "\n")
+cat("Standard Error:", se_n100, "\n")
+
+avg_n200 <- mean(as.numeric(sim_n200[1, ]))
+se_n200  <- sd(as.numeric(sim_n200[1, ]))
+cat("For sample size n = 200:\n")
+cat("Average Global Box Office Earning in Millions:", avg_n200, "\n")
+cat("Standard Error:", se_n200, "\n")
+
+
+
+```
+### **Problem 7: Compare the distributions among different n values, and also compare them to the distribution from the population in Q1.**
+
+As said before, the histogram in Q1 is right skewed, had a relatively low peak at around 0, and had a large range spanning from 0 to 2,000.
+
+In Q6, there are 4 histograms with 4 different sample size: n=20, n=50, n=100, and n=200. As the sample size increases, the spread of the sample means decrease. Furthermore, as the sample size increases, the histograms also become more concentrated around the population mean. This perfectly aligns with Central Limit Theorem, which states that larger samples yield more precise results. All the distribution do not seem to be 100% skewed and they mostly seem to be bell-shaped.
+
+When comparing both, the differences are easily identifiable. The population histogram is severely right skewed whereas none of the histograms from Q6 are as skewed as the population histogram. The sample histograms seem to be more bell-shaped and tighter around the population mean.
+
+
+```{r}
+
+
+
+
+
+```
+
+
+```{r}
+
+```
+
+
+```{r}
+
+```
