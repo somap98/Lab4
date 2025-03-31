@@ -354,3 +354,7 @@ boot_combined %>%
   labs(title = "Bootstrap Distributions with Custom Binwidths",
        x = "Value", y = "Frequency")
 ```
+
+The bootstrap distributions for the sample mean and proportion (based on 500 resamples) are both bell-shaped and centered around values similar to those from the sampling distributions in Q6 and Q8 (with n = 200).
+
+This shows that bootstrapping produces estimates with similar variability and center as traditional sampling from the population. The shapes are also alike—relatively symmetric and concentrated—highlighting that bootstrapping is a reliable method for estimating uncertainty when only one sample is available.
