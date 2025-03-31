@@ -221,6 +221,13 @@ combinedProp %>%
 
 ### **Problem 9: Compare the distributions among different n values**
 
+As we analyze the histograms of the proportion of movies whose global box office earnings exceed their budgets for different sample sizes (n = 20, 50, 100, 200), a clear trend emerges:
+
+Smaller sample sizes (n = 20 and 50) show wider and more variable distributions. This is due to higher sampling variability—proportions can fluctuate more drastically with fewer observations. The histograms for these samples appear more spread out, and some even show slight skewness or irregular shapes.
+
+Larger sample sizes (n = 100 and especially n = 200) result in tighter, more concentrated distributions. These histograms are more symmetric and bell-shaped, with values clustering closer to the true population proportion. The standard error also decreases as sample size increases, indicating more reliable estimates.
+
+
 ---
 
 # **Part II: Bootstrapping**
