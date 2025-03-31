@@ -326,7 +326,6 @@ length(unique(boot_prop))
 ### **Problem 14: Have the histogram of the sample mean and sample proportion from Q13. Have histogram using facet_wrap() to make comparison of the bootstrap distribution with those the in Q6 and Q8 when n=200. Describe the comparison.**
 
 ``` {r}
-
 boot_avg_data <- data.frame(Value = boot_avg, Type = "Bootstrap Mean")
 boot_prop_data <- data.frame(Value = boot_prop, Type = "Bootstrap Proportion")
 
@@ -334,15 +333,17 @@ boot_combined <- rbind(boot_avg_data, boot_prop_data)
 
 boot_combined %>%
   ggplot(aes(x = Value)) +
-  geom_histogram(binwidth = 5, color = "black") +
-  facet_wrap(~ Type, nrow=2) +
-  labs(title = "Bootstrap Distributions of Sample Mean and Proportion",
+  geom_histogram(
+    data = subset(boot_combined, Type == "Bootstrap Mean"),
+    binwidth = 5,
+    color = "black"
+  ) +
+  geom_histogram(
+    data = subset(boot_combined, Type == "Bootstrap Proportion"),
+    binwidth = 0.01,
+    color = "black"
+  ) +
+  facet_wrap(~ Type, scales = "free") +
+  labs(title = "Bootstrap Distributions with Custom Binwidths",
        x = "Value", y = "Frequency")
-
-#TEST BOOT_PROP_AVG SINCE IT"S NOT PLOTTING PROPERLY IN THE PREVIOUS PLOT
-ggplot(boot_prop_data, aes(x = Value)) +
-  geom_histogram(binwidth = 0.01, color = "black", fill = "lightgreen") +
-  labs(title = "Bootstrap Distribution of Proportion > Budget",
-       x = "Proportion", y = "Frequency")
-
 ```
